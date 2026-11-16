@@ -1,0 +1,4 @@
+{"server":"demo-dayz-01","timestamp":"2026-11-01T09:00:00Z","online":19,"capacity":80,"queue":0,"available":true}
+{"server":"demo-dayz-01","timestamp":"2026-11-01T10:00:00Z","online":32,"capacity":80,"queue":4,"available":true}
+{"server":"demo-dayz-01","timestamp":"2026-11-01T11:00:00Z","online":0,"capacity":80,"queue":0,"available":false}
+{"server":"demo-dayz-01","timestamp":"2026-11-01T12:00:00Z","online":44,"capacity":80,"queue":3,"available":true}
