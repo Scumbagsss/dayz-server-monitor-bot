@@ -99,18 +99,22 @@ class MonitorStore:
         finally:
             connection.close()
 
+    @staticmethod
+    def _upsert(connection: sqlite3.Connection, snapshot: Snapshot) -> None:
+        connection.execute("""
+            INSERT INTO snapshots(server, timestamp, online, capacity, queue, available)
+            VALUES (:server, :timestamp, :online, :capacity, :queue, :available)
+            ON CONFLICT(server, timestamp) DO UPDATE SET
+                online=excluded.online,
+                capacity=excluded.capacity,
+                queue=excluded.queue,
+                available=excluded.available
+        """, asdict(snapshot))
+
     def record(self, payload: Mapping[str, object]) -> Snapshot:
         snapshot = Snapshot.from_mapping(payload)
         with self._connection() as connection:
-            connection.execute("""
-                INSERT INTO snapshots(server, timestamp, online, capacity, queue, available)
-                VALUES (:server, :timestamp, :online, :capacity, :queue, :available)
-                ON CONFLICT(server, timestamp) DO UPDATE SET
-                    online=excluded.online,
-                    capacity=excluded.capacity,
-                    queue=excluded.queue,
-                    available=excluded.available
-            """, asdict(snapshot))
+            self._upsert(connection, snapshot)
         return snapshot
 
     def latest(self, server: str) -> dict | None:
@@ -156,18 +160,21 @@ class MonitorStore:
 
 
 def ingest_jsonl(store: MonitorStore, path: str | Path) -> int:
-    """Import synthetic JSON Lines data. Invalid input fails with a line number."""
-    count = 0
+    """Validate the entire synthetic batch before writing it in one transaction."""
+    parsed: list[Snapshot] = []
     for line_no, text in enumerate(Path(path).read_text(encoding="utf-8").splitlines(), 1):
         if not text.strip():
             continue
         try:
-            data = json.loads(text)
-            store.record(data)
+            snapshot = Snapshot.from_mapping(json.loads(text))
         except (json.JSONDecodeError, SnapshotError) as exc:
             raise SnapshotError(f"Line {line_no}: {exc}") from exc
-        count += 1
-    return count
+        parsed.append(snapshot)
+
+    with store._connection() as connection:
+        for snapshot in parsed:
+            store._upsert(connection, snapshot)
+    return len(parsed)
 
 
 def main() -> None:
