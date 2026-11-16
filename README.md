@@ -73,3 +73,5 @@ The private integration may involve `discord.py`, `aiosqlite`, `matplotlib` and 
 This is a single-process educational example: no live polling, network retry scheduler, rate limiting, authentication or deployment automation. Synthetic samples cannot establish live reliability or usage metrics.
 
 **Author:** [Scumbagsss](https://github.com/Scumbagsss) · Python Backend · Automation
+
+**Contact:** Discord — `scumbagsss` · Telegram — [@dilarion](https://t.me/dilarion).
