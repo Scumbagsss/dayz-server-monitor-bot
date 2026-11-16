@@ -14,6 +14,10 @@ A game-server operations team needs more than a single "online" indicator. Avail
 
 The private project integrates server data with Discord status reporting. This public example focuses on the **data ingestion and persistence side** using Python's standard library.
 
+![Server-monitoring demonstration with synthetic snapshots](assets/monitor-dashboard.svg)
+
+*Chart values come from the repository's fabricated JSONL fixture, not a live DayZ server.*
+
 ## Run the demo
 
 Requires **Python 3.11 or newer**. No Discord token, third-party dependencies or server access is required.
