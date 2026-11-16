@@ -1,0 +1,37 @@
+name: Synthetic monitor demo tests
+
+on:
+  push:
+    paths:
+      - "monitor_demo.py"
+      - "tests/**"
+      - "fixtures/**"
+      - ".github/workflows/monitor-demo.yml"
+  pull_request:
+    paths:
+      - "monitor_demo.py"
+      - "tests/**"
+      - "fixtures/**"
+      - ".github/workflows/monitor-demo.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Compile
+        run: python -m py_compile monitor_demo.py
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Run example
+        run: python monitor_demo.py --db /tmp/monitor-demo.sqlite3
