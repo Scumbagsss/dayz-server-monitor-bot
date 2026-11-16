@@ -138,6 +138,25 @@ class StoreTests(unittest.TestCase):
         with self.assertRaisesRegex(SnapshotError, "Line 2"):
             ingest_jsonl(self.store, p)
 
+    def test_invalid_batch_does_not_partially_import(self):
+        p = Path(self.temp.name) / "atomic.jsonl"
+        p.write_text(json.dumps(GOOD) + "\nnot json\n", encoding="utf-8")
+        with self.assertRaisesRegex(SnapshotError, "Line 2"):
+            ingest_jsonl(self.store, p)
+        self.assertIsNone(self.store.latest("demo-01"))
+
+    def test_invalid_data_does_not_modify_existing_snapshot(self):
+        self.store.record(GOOD)
+        p = Path(self.temp.name) / "batch.jsonl"
+        p.write_text(
+            json.dumps({**GOOD, "online": 30}) + "\n" +
+            json.dumps({**GOOD, "online": 999}) + "\n",
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(SnapshotError, "Line 2"):
+            ingest_jsonl(self.store, p)
+        self.assertEqual(self.store.latest("demo-01")["online"], 12)
+
     def test_in_memory_not_supported(self):
         with self.assertRaises(ValueError):
             MonitorStore(":memory:")
