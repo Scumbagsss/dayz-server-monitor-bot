@@ -29,13 +29,13 @@ The command imports [fictional JSONL readings](fixtures/demo_snapshots.jsonl), s
 
 | Capability | Implementation |
 |---|---|
-| Ingestion | JSON Lines with input validation and line-numbered errors |
+| Ingestion | JSON Lines with full-batch validation, atomic writes and line-numbered errors |
 | Timestamps | Parse ISO 8601, require timezone, normalize to UTC |
 | Storage | SQLite, parameterized SQL, persistent history |
 | Retries / duplicates | Upsert by server name and timestamp |
 | Retrieval | Query latest server reading |
 | Reporting | Daily count, availability among samples, mean/peak players and peak queue |
-| Automated tests | **26 synthetic tests** across parsing, persistence, duplicates and summaries |
+| Automated tests | **28 synthetic tests** across parsing, persistence, duplicates and summaries |
 | CI | Python **3.11, 3.12 and 3.13** matrix |
 
 The daily availability percentage is based on the **fraction of stored samples marked available**, not a time-weighted SLA or an uptime guarantee.
@@ -62,7 +62,7 @@ The private integration may involve `discord.py`, `aiosqlite`, `matplotlib` and 
 ## Repository guide
 
 - [`monitor_demo.py`](monitor_demo.py) — runnable synthetic data pipeline
-- [`tests/test_monitor_demo.py`](tests/test_monitor_demo.py) — 26 unit tests
+- [`tests/test_monitor_demo.py`](tests/test_monitor_demo.py) — 28 unit tests
 - [`fixtures/demo_snapshots.jsonl`](fixtures/demo_snapshots.jsonl) — fabricated snapshots
 - [`.github/workflows/monitor-demo.yml`](.github/workflows/monitor-demo.yml) — automated validation
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — private system boundary
